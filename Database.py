@@ -1,4 +1,5 @@
 import sqlite3
+import time
 
 
 class Database:
@@ -35,6 +36,7 @@ class Database:
         db.commit()
         db.close()
 
+
 class DVDMod:
     def insertdvd(self, title, release_date, language, barcode):
         db = sqlite3.connect('DVDManager.db')
@@ -46,10 +48,10 @@ class DVDMod:
         else:
             if barcode == "":
                 cursor.execute("INSERT INTO DVD (title, release_date, language) VALUES (?, ?, ?)",
-                               (title, release_date, language))
+                               (title.lower(), release_date, language))
             else:
                 cursor.execute("INSERT INTO DVD (title, release_date, language,barcode) VALUES (?, ?, ?, ?)",
-                               (title, release_date, language, barcode))
+                               (title.lower(), release_date, language, barcode))
             db.commit()
             print("DVD Added")
         db.close()
@@ -64,10 +66,10 @@ class DVDMod:
     def removedvd(self, title):
         db = sqlite3.connect('DVDManager.db')
         cursor = db.cursor()
-        cursor.execute('SELECT id FROM DVD WHERE title = ?', (title,))
+        cursor.execute('SELECT id FROM DVD WHERE title = ?', (title.lower(),))
         existing_dvd = cursor.fetchone()
         if existing_dvd:
-            cursor.execute('DELETE FROM DVD WHERE title = ?', (title,))
+            cursor.execute('DELETE FROM DVD WHERE title = ?', (title.lower(),))
             db.commit()
             print("DVD Removed")
         else:
@@ -77,14 +79,14 @@ class DVDMod:
     def updatedvd(self, orgtitle, title, barcode):
         db = sqlite3.connect('DVDManager.db')
         cursor = db.cursor()
-        cursor.execute('SELECT id FROM DVD WHERE title = ?', (orgtitle,))
+        cursor.execute('SELECT id FROM DVD WHERE title = ?', (orgtitle.lower(),))
         existing_dvd = cursor.fetchone()
         if existing_dvd:
             print("DVD found")
             time.sleep(2)
-            cursor.execute('SELECT title,release_date,language,barcode FROM DVD WHERE title = ?', (orgtitle,))
+            cursor.execute('SELECT title,release_date,language,barcode FROM DVD WHERE title = ?', (orgtitle.lower(),))
             dvd = cursor.fetchone()
-            cursor.execute('DELETE FROM DVD WHERE title = ?', (orgtitle,))
+            cursor.execute('DELETE FROM DVD WHERE title = ?', (orgtitle.lower(),))
             print(dvd[0])
             if title == "":
                 title = dvd[0]
@@ -92,10 +94,10 @@ class DVDMod:
                 barcode = dvd[3]
             if barcode == "":
                 cursor.execute("INSERT INTO DVD (title, release_date, language) VALUES (?, ?, ?)",
-                               (title, dvd[1], dvd[2]))
+                               (title.lower(), dvd[1], dvd[2]))
             else:
                 cursor.execute("INSERT INTO DVD (title, release_date, language,barcode) VALUES (?, ?, ?, ?)",
-                               (title, dvd[1], dvd[2], barcode))
+                               (title.lower(), dvd[1], dvd[2], barcode))
 
             db.commit()
         db.close()
@@ -117,3 +119,75 @@ class DVDMod:
                 print("{:<5} {:<20} {:<15} {:<15} {:<10}".format(*formatted_record))
         else:
             print("The 'DVD' table is empty.")
+        db.close()
+
+
+class ActorMod:
+    def addActor(self, actorName, dvdTitle):
+        db = sqlite3.connect('DVDManager.db')
+        cursor = db.cursor()
+        cursor.execute('SELECT id FROM DVD WHERE title = ?', (dvdTitle.lower(),))
+        existing_dvd = cursor.fetchone()
+        if existing_dvd:
+            cursor.execute("INSERT INTO actor (name, dvd_id) VALUES (?, ?)",
+                           (actorName.lower(), existing_dvd[0]))
+            db.commit()
+            print("Actor added successfully.")
+        else:
+            print("dvd not found in the database.")
+            input("Press Enter to continue...")
+        db.close()
+
+    def listActor(self):
+        db = sqlite3.connect('DVDManager.db')
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM actor')
+        dvd_records = cursor.fetchall()
+        if dvd_records:
+            # Print the header
+            print("{:<5} {:<20} {:<15}".format("ID", "Name", "Dvd_id"))
+            print("-" * 70)
+
+            # Print each record
+            for record in dvd_records:
+                formatted_record = tuple('NULL' if value is None else value for value in record)
+
+                print("{:<5} {:<20} {:<15}".format(*formatted_record))
+        else:
+            print("The 'DVD' table is empty.")
+        db.close()
+
+class CharacterMod:
+    def addCharacter(self, characterName,actorName):
+        db = sqlite3.connect('DVDManager.db')
+        cursor = db.cursor()
+        cursor.execute('SELECT id FROM actor WHERE name = ?', (actorName.lower(),))
+        existing_actor = cursor.fetchone()
+        if existing_actor:
+            cursor.execute("INSERT INTO character (name, actor_id) VALUES (?, ?)",
+                           (characterName.lower(), existing_actor[0]))
+            db.commit()
+        else:
+            print("actor not found in the database.")
+            input("Press Enter to continue...")
+
+        db.close()
+
+    def listCharacters(self):
+        db = sqlite3.connect('DVDManager.db')
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM character')
+        dvd_records = cursor.fetchall()
+        if dvd_records:
+            # Print the header
+            print("{:<5} {:<20} {:<15}".format("ID", "Name", "Actor_id"))
+            print("-" * 70)
+
+            # Print each record
+            for record in dvd_records:
+                formatted_record = tuple('NULL' if value is None else value for value in record)
+
+                print("{:<5} {:<20} {:<15}".format(*formatted_record))
+        else:
+            print("The 'DVD' table is empty.")
+        db.close()

@@ -9,9 +9,14 @@ def clear():
 
 
 from Database import Database
-
+from Database import DVDMod
+from Database import ActorMod
+from Database import CharacterMod
 
 database = Database()
+dvd = DVDMod()
+actor = ActorMod()
+character = CharacterMod()
 
 database.create()
 
@@ -22,8 +27,10 @@ while True:
     print("3. Update DVD")
     print("4. List DVD's")
     print("5. Add Actor")
-    print("3. Add Character")
-    print("7. Exit")
+    print("6. List Actors")
+    print("7. Add Character")
+    print("8. List Characters")
+    print("9. Exit")
     option = input("Select an option: ")
     match option:
         case "1":
@@ -32,26 +39,47 @@ while True:
             release_date = input("Release date of DVD: ")
             language = input("Original language of DVD: ")
             barcode = input("Barcode of DVD (Optional): ")
-            database.insertdvd(title, release_date, language, barcode)
+            dvd.insertdvd(title, release_date, language, barcode)
         case "2":
             clear()
             title = input("Title of DVD: ")
-            database.removedvd(title)
+            dvd.removedvd(title)
         case "3":
             clear()
             orgtitle = input("(old) Title of DVD: ")
             title = input("New Title of DVD (Optional): ")
             barcode = input("New Barcode of DVD (Optional): ")
-            database.updatedvd(orgtitle, title, barcode)
+            dvd.updatedvd(orgtitle, title, barcode)
         case "4":
             clear()
-            database.listDVD()
+            dvd.listDVD()
             print()
             input("Press Enter to continue...")
         case "5":
             clear()
             name = input("Name of actor: ")
             title = input("Title of dvd: ")
+            actor.addActor(name,title)
+        case "6":
+            clear()
+            actor.listActor()
+            print()
+            input("Press Enter to continue...")
+
+        case "7":
+            clear()
+            name = input("Name of character: ")
+            actorname = input("Name of Actor: ")
+            character.addCharacter(name,actorname)
+        case "8":
+            clear()
+            character.listCharacters()
+            print()
+            input("Press Enter to continue...")
+        case "9":
+            break
+
+
             
 
 
