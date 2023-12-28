@@ -12,11 +12,13 @@ from Database import Database
 from Database import DVDMod
 from Database import ActorMod
 from Database import CharacterMod
+from Export import export
 
 database = Database()
 dvd = DVDMod()
 actor = ActorMod()
 character = CharacterMod()
+export = export()
 
 database.create()
 
@@ -30,7 +32,8 @@ while True:
     print("6. List Actors")
     print("7. Add Character")
     print("8. List Characters")
-    print("9. Exit")
+    print("9. Export to csv")
+    print("10. Exit")
     option = input("Select an option: ")
     match option:
         case "1":
@@ -77,6 +80,20 @@ while True:
             print()
             input("Press Enter to continue...")
         case "9":
+            clear()
+            print("1. DVD Table")
+            print("2. Actor Table")
+            print("3. Character Table")
+            option2 = input("Select an option: ")
+            match option2:
+                case "1":
+                    export.export_to_csv('DVD', 'dvd_data.csv')
+                case "2":
+                    export.export_to_csv('Actor', 'actor_data.csv')
+                case "3":
+                    export.export_to_csv('Character', 'character_data.csv')
+            input("Press Enter to continue...")
+        case "10":
             break
 
 

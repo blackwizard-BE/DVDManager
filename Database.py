@@ -157,8 +157,9 @@ class ActorMod:
             print("The 'DVD' table is empty.")
         db.close()
 
+
 class CharacterMod:
-    def addCharacter(self, characterName,actorName):
+    def addCharacter(self, characterName, actorName):
         db = sqlite3.connect('DVDManager.db')
         cursor = db.cursor()
         cursor.execute('SELECT id FROM actor WHERE name = ?', (actorName.lower(),))
